@@ -21,7 +21,7 @@
       <button type="submit" class="btn btn-dark">Login</button>
     </form>
     <a href="forgotpassword.html">Forgot Password</a><br>
-    <a href="signup.html">New user Signin </a>
+    <a href="signup.html">New user Signup </a>
     
     </div>
     </div>
@@ -29,5 +29,37 @@
 </html>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
 <script >
+  const ip='localhost:3000';
+const form = document.getElementById('loginform');
+ form.addEventListener('submit',onsubmit);
+ function onsubmit(e){
+  e.preventDefault();
+  const email=document.getElementById('email').value;
+  const password=document.getElementById('password').value;
+  const obj={
+    email,
+    password
+    
+  }
+
+  axios.post(`http://${ip}/user/login`,obj)
+  .then((res)=>{
+    console.log(res.data);
+    if(res.data.sucess==true){
+      alert('Login Sucessfully');
+      localStorage.setItem('token',res.data.token);
+    }else if(res.data.sucess==false){
+      alert('User does not exist');
+      alert('please signup as new user');
+    }
+    else{
+      alert('Password is incorrect');
+    }
+  })
+  .catch((err)=>{
+    console.log(err); 
+  })
+
+ };
 
 </script>
