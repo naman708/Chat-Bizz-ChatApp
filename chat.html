@@ -26,7 +26,7 @@
         <input type="text" id="chatmessage" class="form-control message-input" placeholder="Type your message...">
       </div>
       <div class="col-3">
-        <button class="btn btn-primary send-button">Send</button>
+        <button class="btn btn-primary send-button" id="sendbtn">Send</button>
       </div>
     </div>
   </div>
@@ -35,6 +35,28 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
 <script>
+    const ip='localhost:3000';
+  const sendMessage=document.getElementById('sendbtn');
+  sendMessage.onclick=async function(e){
+    const message=document.getElementById('chatmessage').value;
+    obj={
+        message
+    }
+    const token=localStorage.getItem('token');
+    const headers = {
+        "Authorization":token
+    };
+   axios.post(`http://${ip}/user/sendmessage`,obj,{headers})
+   .then((res)=>{
+     console.log(res.data);
+   })
+   .catch((err)=>{
+    console.log(err);
+   })
+
+
+  }
+
 
 </script>
 
