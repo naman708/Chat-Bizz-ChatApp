@@ -1,13 +1,22 @@
-const express = require('express');
-const router = express.Router();
-const chatController = require('../controllers/chat');
-const authenticatemiddleware = require('../middleware/auth');
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../util/database');
 
+const Chat = sequelize.define('chat', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true,
+  },
+  message: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  
+});
 
-router.post('/user/sendmessage',authenticatemiddleware.authenticate,chatController.storemessage);
-
-
-
-
-
-module.exports = router;
+module.exports = Chat;

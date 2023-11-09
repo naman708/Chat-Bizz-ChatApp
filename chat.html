@@ -55,7 +55,23 @@
    })
 
 
-  }
+  };
+
+  window.addEventListener('DOMContentLoaded',()=>{
+    const token=localStorage.getItem('token');
+    const headers = {
+        "Authorization":token
+    };
+
+    axios.get(`http://${ip}/user/getmessages`,{headers})
+    .then((res)=>{
+      console.log(res.data)
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+
+  })
 
 
 </script>
