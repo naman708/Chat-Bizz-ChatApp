@@ -13,10 +13,9 @@
     <div class="row">
       <div class="col-12">
       
-        <div class="chat-messages" style="height: calc(100vh - 100px); overflow-y: auto;">
+        <div class="chat-messages" id="displaymessages" style="height: calc(100vh - 100px); overflow-y: auto;">
           <!-- Display chat messages here -->
-          <p>Message 1</p>
-          <p>Message 2</p>
+         
           <!-- Add more chat messages as needed -->
         </div>
       </div>
@@ -66,13 +65,52 @@
     axios.get(`http://${ip}/user/getmessages`,{headers})
     .then((res)=>{
       console.log(res.data)
+      for(var i=0;i<res.data.message.length;i++){
+        showMessages(res.data.message[i]);
+
+      }
     })
     .catch((err)=>{
       console.log(err);
     })
 
   })
+  function showMessages(e){
+    const displayChat=document.getElementById('displaymessages');
+    const messageElement = document.createElement('p');
+  messageElement.textContent = `${e.username}: ${e.message}`;
+  
+  // Append the new message to the existing content
+  displayChat.appendChild(messageElement);
+  
+  // Optionally, you can also scroll to the bottom to always show the latest messages
+  displayChat.scrollTop = displayChat.scrollHeight;
+  }
+ 
+  function fetchAndDislayMessages(){
+    const token=localStorage.getItem('token');
+    const headers = {
+        "Authorization":token
+    };
 
+    axios.get(`http://${ip}/user/getmessages`,{headers})
+    .then((res)=>{
+      //console.log(res.data)
+      const displayChat = document.getElementById('displaymessages');
+      // Clear existing content
+      displayChat.innerHTML = '';
+      for(var i=0;i<res.data.message.length;i++){
+        showMessages(res.data.message[i]);
+
+      }
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+
+  }
+  //fetchAndDislayMessages();
+  setInterval(fetchAndDislayMessages,1000);
 
 </script>
 
