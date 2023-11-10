@@ -20,11 +20,13 @@ app.use(cors());
 // write models requirement here
 const User=require('./models/user');
 const Chat=require('./models/chat');
+const Group=require('./models/group');
+const GroupUser=require('./models/groupUser');
 
 // write routes reqiurement here
 const  userRoutes = require('./routes/user');
 const chatRoutes = require('./routes/chat');
-//const purchase= require('./routes/purchase');
+const groupRoutes= require('./routes/group');
 //const PremiumFeat= require('./routes/premiumfeature');
 //const ResetPassword= require('./routes/resetpassword');
 //const downloaduserreport= require('./routes/Downloadreport');
@@ -35,7 +37,7 @@ app.use(express.static(path.join(__dirname,'public')));
 //routes
 app.use(userRoutes);
 app.use(chatRoutes);
-//app.use(purchase);
+app.use(groupRoutes);
 //app.use(PremiumFeat);
 //app.use(ResetPassword);
 //app.use(downloaduserreport);
@@ -48,6 +50,10 @@ app.use((req,res)=>{
 //models
 User.hasMany(Chat);
 Chat.belongsTo(User);
+Group.hasMany(Chat);
+Chat.belongsTo(Group);
+User.belongsToMany(Group, { through: GroupUser });
+Group.belongsToMany(User, { through: GroupUser });
 
 sequelize.sync().then(() => {
   console.log('Database & tables created!');

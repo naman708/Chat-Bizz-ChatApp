@@ -9,25 +9,37 @@
 </head>
 <body>
   <div class="container" style="min-height: 100vh;">
-    <h1 class="title">Chat Bizzz</h1>
+    <div class="container d-flex align-items-center">
+      <h1 class="title">Chat Bizzz</h1> <button id="creategroup" onclick="createGroup()" class="btn btn-primary ms-auto">Create new group</button>
+
+    </div>
     <div class="row">
-      <div class="col-12">
+      <div class="col-3" id="group-list">
+        <h4>Chats</h4>
+        <div class="list-group" id="grouplist" >
+
+        </div>
+       
+      </div>
+      <div class="col-9" id="messages">
+        <h4>messages</h4>
       
         <div class="chat-messages" id="displaymessages" style="height: calc(100vh - 100px); overflow-y: auto;">
           <!-- Display chat messages here -->
          
           <!-- Add more chat messages as needed -->
         </div>
+        <div class="row">
+          <div class="col-9">
+            <input type="text" id="chatmessage" class="form-control message-input" placeholder="Type your message...">
+          </div>
+          <div class="col-3">
+            <button class="btn btn-primary send-button" id="sendbtn">Send</button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-9">
-        <input type="text" id="chatmessage" class="form-control message-input" placeholder="Type your message...">
-      </div>
-      <div class="col-3">
-        <button class="btn btn-primary send-button" id="sendbtn">Send</button>
-      </div>
-    </div>
+  
   </div>
 </body>
 </html>
@@ -35,11 +47,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
 <script>
     const ip='localhost:3000';
+    const chats =document.getElementById('group-list');
+    chats.style.backgroundColor='grey';
   const sendMessage=document.getElementById('sendbtn');
   sendMessage.onclick=async function(e){
     const message=document.getElementById('chatmessage').value;
+    const groupId=localStorage.getItem('groupId');
     obj={
-        message
+        message,
+        groupId
     }
     const token=localStorage.getItem('token');
     const headers = {
@@ -62,11 +78,11 @@
         "Authorization":token
     };
 
-    axios.get(`http://${ip}/user/getmessages`,{headers})
+    axios.get(`http://${ip}/user/getgroups`,{headers})
     .then((res)=>{
       console.log(res.data)
-      for(var i=0;i<res.data.message.length;i++){
-        showMessages(res.data.message[i]);
+      for(var i=0;i<res.data.Allgroups.length;i++){
+        showGroup(res.data.Allgroups[i]);
 
       }
     })
@@ -89,11 +105,13 @@
  
   function fetchAndDislayMessages(){
     const token=localStorage.getItem('token');
+    const groupId=localStorage.getItem('groupId');
+   
     const headers = {
         "Authorization":token
     };
 
-    axios.get(`http://${ip}/user/getmessages`,{headers})
+    axios.get(`http://${ip}/user/getmessages/${groupId}`,{headers})
     .then((res)=>{
       //console.log(res.data)
       const displayChat = document.getElementById('displaymessages');
@@ -109,8 +127,44 @@
     })
 
   }
+  function createGroup() {
+    const groupname = prompt('Enter the name of the new group:');
+    if (groupname) {
+      obj={
+        groupname
+      }
+      const token=localStorage.getItem('token');
+      const headers = {
+        "Authorization":token
+      };
+     axios.post(`http://${ip}/user/creategroup`,obj,{headers})
+     .then((res)=>{
+       console.log(res.data);
+       showGroup(res.data.Groupdata);
+     })
+     .catch((err)=>{
+      console.log(err);
+     })
+    }
+
+  }
+  function showGroup(e){
+    
+      const groupList = document.getElementById('grouplist');
+      const newGroup = document.createElement('div');
+      newGroup.className = 'list-group-item';
+      newGroup.innerText = `${e.groupname}`;
+      newGroup.onclick = function() {
+        console.log(`${e.groupId}`);
+        localStorage.setItem('groupId',e.groupId);
+        fetchAndDislayMessages();
+      };
+      groupList.appendChild(newGroup);
+    
+
+  }
   //fetchAndDislayMessages();
-  setInterval(fetchAndDislayMessages,1000);
+ // setInterval(fetchAndDislayMessages,1000);
 
 </script>
 
