@@ -23,6 +23,10 @@
       </div>
       <div class="col-9" id="messages">
         <h4>messages</h4>
+        <div class="container d-flex align-items-center" id="groupchatfeature">
+         
+    
+        </div>
       
         <div class="chat-messages" id="displaymessages" style="height: calc(100vh - 100px); overflow-y: auto;">
           <!-- Display chat messages here -->
@@ -157,12 +161,49 @@
       newGroup.onclick = function() {
         console.log(`${e.groupId}`);
         localStorage.setItem('groupId',e.groupId);
+        localStorage.setItem('groupname',e.groupname);
+        inviteUser();
         fetchAndDislayMessages();
       };
       groupList.appendChild(newGroup);
     
 
   }
+  function inviteUser(e){
+    const groupFeatures=document.getElementById('groupchatfeature');
+    groupFeatures.innerHTML='';
+     const button=document.createElement('button');
+     button.className="btn btn-sm ";
+     button.style.backgroundColor='lightgreen';
+     button.appendChild(document.createTextNode('Add User'));
+     groupFeatures.appendChild(button);
+      
+     button.onclick=()=>{
+      const username = prompt('Enter the user name:')
+      console.log(username);
+      if(username){
+        const groupname=localStorage.getItem('groupname');
+        const groupId=localStorage.getItem('groupId');
+         obj={
+          groupname,
+          groupId
+        }
+        axios.post(`user/group/adduser/${username}`,obj)
+        .then((res)=>{
+          console.log(res.data);
+        })
+        .catch((err)=>{
+          console.log(err);
+        })
+
+      }
+
+      
+     }
+
+
+
+  };
   //fetchAndDislayMessages();
  // setInterval(fetchAndDislayMessages,1000);
 
