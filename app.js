@@ -24,6 +24,7 @@ const User = require('./models/user');
 const Chat = require('./models/chat');
 const Group = require('./models/group');
 const GroupUser = require('./models/groupUser');
+const ArchivedChat = require('./models/archivedChat');
 
 const userRoutes = require('./routes/user');
 const chatRoutes = require('./routes/chat');
@@ -64,12 +65,12 @@ io.on('connection', (socket) => {
   console.log('A user connected');
 
   // Example: Listen for 'message' events from clients
-  socket.on('message', (data) => {
-    console.log('Received message:', data);
+ // socket.on('message', (data) => {
+    //console.log('Received message:', data);
 
     // Broadcast the message to all connected clients
-    io.emit('message', data);
-  });
+    //io.emit('message', data);
+ // });
 
   // Example: Handle disconnection
   socket.on('disconnect', () => {
