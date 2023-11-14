@@ -70,7 +70,7 @@
    axios.post(`http://${ip}/user/sendmessage`,obj,{headers})
    .then((res)=>{
      console.log(res.data);
-     //socket.emit('message', { action: 'create', message: res.data });
+     //socket.emit('send-message', { action: 'create', message: res.data,groupId:groupId });
    })
    .catch((err)=>{
     console.log(err);
@@ -80,9 +80,17 @@
   };
   socket.on('message', (data) => {
     // Handle incoming messages from the server
-    console.log('Received message:', data);
-    showMessages(data.message);
+    //console.log('Received message:', data);
+    const id=localStorage.getItem('groupId');
+   // console.log(id);
+    //console.log(`gid>>>>>>>>>${data.message.groupId}`);
+    if(id==data.message.groupId){
+      showMessages(data.message);
 
+
+    }
+
+    
     // Update the UI or perform any other actions based on the received message
   });
 
@@ -173,9 +181,11 @@
         localStorage.setItem('groupId',e.groupId);
         localStorage.setItem('groupname',e.groupname);
         
-        
+        socket.emit('joinGroup',e.groupId);
         adminFeatures();
         inviteUser();
+        deleteUser();
+        makeUserAdmin();
         fetchAndDislayMessages();
       };
       groupList.appendChild(newGroup);
@@ -204,6 +214,9 @@ function adminFeatures(){
     if(res.data.adminId==Decode.UserId){
       //console.log('admin');
       adminFeaturesDiv.style.visibility='visible';
+      const admin=document.createElement('div')
+      admin.innerHTML='<h6>You are admin </h6>'
+      adminFeaturesDiv.appendChild(admin);
     }
   })
   .catch((err)=>{
@@ -252,8 +265,79 @@ function adminFeatures(){
 
 
   };
-  //fetchAndDislayMessages();
- // setInterval(fetchAndDislayMessages,1000);
+
+  function deleteUser(e){
+    const groupFeatures=document.getElementById('groupchatfeature');
+   // groupFeatures.innerHTML='';
+     const button=document.createElement('button');
+     button.className="btn btn-sm ";
+     button.style.backgroundColor='red';
+     button.appendChild(document.createTextNode('Delete User'));
+     groupFeatures.appendChild(button);
+
+     button.onclick=()=>{
+      const username=prompt('Enter the user name');
+      //const groupId=localStorage.getItem('groupId');
+      //console.log('groupId:', groupId);
+      if(username){
+        const groupname=localStorage.getItem('groupname');
+        const groupId=localStorage.getItem('groupId');
+         
+        axios.delete(`http://${ip}/user/deleteuser/${username}`,{ data: {groupId} })
+        .then((res)=>{
+          console.log(res);
+          if(res.data.success==true){
+            alert(`${username} removed from the group`)
+
+          }
+          else{
+            alert('Please enter valid username')
+          }
+        })
+        .catch((err)=>{
+          console.log(err);
+        })
+      }
+     }
+
+  };
+  function makeUserAdmin(){
+    const groupFeatures=document.getElementById('groupchatfeature');
+   // groupFeatures.innerHTML='';
+     const button=document.createElement('button');
+     button.className="btn btn-sm ";
+     button.style.backgroundColor='gold';
+     button.appendChild(document.createTextNode('Make New Admin'));
+     groupFeatures.appendChild(button);
+     button.onclick=()=>{
+      const username=prompt('Enter the user name')
+      if(username){
+        const groupname=localStorage.getItem('groupname');
+        obj={
+          groupname
+        }
+        axios.post(`http://${ip}/user/makeadmin/${username}`,obj)
+        .then((res)=>{
+          console.log(res);
+          if(res.data.success==true){
+            alert(`${username} is now new admin`);
+            const adminFeaturesDiv = document.getElementById('groupchatfeature');
+            adminFeaturesDiv.style.visibility='hidden';
+            
+
+          }
+          else{
+            alert(`Please enter the valid user name`);
+          }
+        })
+        .catch((err)=>{
+          console.log(err);
+        })
+      }
+
+     }
+
+  };
 
 </script>
 
